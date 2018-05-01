@@ -1,37 +1,24 @@
 import unittest
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver import DesiredCapabilities
-from  selenium.webdriver.common.by import By
 
-class HomePageTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(inst):
-        # create a new Firefox session
-        cap = DesiredCapabilities.FIREFOX
-        cap['marionette'] = False
-        inst.driver = webdriver.Firefox(capabilities=cap)
-        inst.driver.implicitly_wait(30)
-        inst.driver.maximize_window()
-        # navigate to the application home page
-        inst.driver.get("http://www.google.com/")
-    def test_search_text_box(self):
-        self.assertTrue(self.is_element_present(By.NAME,"q"))
+import os
+from HtmlTestRunner import HTMLTestRunner
+from UnitTest import SearchText
+from GoogleImage import HomePageTest
 
-    def test_image_link(self):
-        image_link = self.driver.find_element_by_link_text("Images")
-        image_link.click()
-        self.assertTrue(self.is_element_present(By.NAME,"q"))
-        self.search_field = self.driver.find_element_by_name("q")
-        self.search_field.send_keys("Selenium Webdriver framework architecture diagram")
-        self.search_field.submit()
-    @classmethod
-    def tearDownClass(inst):
-        inst.driver.quit()
+# get the directory path to output report file
+dir = os.getcwd()
 
-    def is_element_present(self, how, what):
-        try: self.driver.find_element(by=how,value=what)
-        except NoSuchElementException: return False
-        return True
-if __name__ == '__main__':
-    unittest.main()
+
+# get all tests from SearchText and HomePageTest class
+search_text = unittest.TestLoader().loadTestsFromTestCase(SearchText)
+home_page_test = unittest.TestLoader().loadTestsFromTestCase(HomePageTest)
+
+# create a test suite combining search_text and home_page_test
+test_suite = unittest.TestSuite([home_page_test, search_text])
+
+# run the suite
+runner = HTMLTestRunner(output='example_test_suite')
+
+
+# run the suite using HTMLTestRunner
+runner.run(test_suite)
